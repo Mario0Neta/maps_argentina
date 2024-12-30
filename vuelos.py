@@ -8,13 +8,13 @@ vuelos_df = pd.read_csv("/home/leontxo/Documents/maps_argentina/base_microdatos.
 aeropuertos_ar_df = pd.read_csv("/home/leontxo/Documents/maps_argentina/ar-airports.csv")
 
 # %%
-vuelos_ar_df = vuelos_df[(vuelos_df["origen_pais"] == "Argentina") & (vuelos_df["destino_pais"] == "Argentina")]
+vuelos_ar_df = vuelos_df[(vuelos_df["origen_pais"] == "Argentina") & (vuelos_df["destino_pais"] == "Argentina")].copy()
 airports = airportsdata.load()
 # %%
-vuelos_ar_df["latitud_origen"] = vuelos_ar_df["origen_oaci"].map(lambda x: airports.get(x, {}).get("lat"))
-vuelos_ar_df["longitud_origen"] = vuelos_ar_df["origen_oaci"].map(lambda x: airports.get(x, {}).get("lon"))
-vuelos_ar_df["latitud_destino"] = vuelos_ar_df["destino_oaci"].map(lambda x: airports.get(x, {}).get("lat"))
-vuelos_ar_df["longitud_destino"] = vuelos_ar_df["destino_oaci"].map(lambda x: airports.get(x, {}).get("lon"))
+vuelos_ar_df.loc[:,"latitud_origen"] = vuelos_ar_df["origen_oaci"].map(lambda x: airports.get(x, {}).get("lat"))
+vuelos_ar_df.loc[:,"longitud_origen"] = vuelos_ar_df["origen_oaci"].map(lambda x: airports.get(x, {}).get("lon"))
+vuelos_ar_df.loc[:,"latitud_destino"] = vuelos_ar_df["destino_oaci"].map(lambda x: airports.get(x, {}).get("lat"))
+vuelos_ar_df.loc[:,"longitud_destino"] = vuelos_ar_df["destino_oaci"].map(lambda x: airports.get(x, {}).get("lon"))
 
 # %%
 fig = go.Figure()

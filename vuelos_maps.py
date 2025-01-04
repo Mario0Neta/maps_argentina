@@ -7,7 +7,7 @@ vuelos_df = pd.read_csv("/home/leontxo/Documents/maps_argentina/base_microdatos.
 aeropuertos_ar_df = pd.read_csv("/home/leontxo/Documents/maps_argentina/ar-airports.csv")
 
 # %%
-vuelos_ar_df = vuelos_df[(vuelos_df["origen_pais"] == "Argentina") & (vuelos_df["destino_pais"] == "Argentina")].copy()
+vuelos_ar_df = vuelos_df[(vuelos_df["clasificacion_vuelo"] == "Cabotaje")].copy()
 airports = airportsdata.load()
 # %%
 vuelos_ar_df.loc[:,"latitud_origen"] = vuelos_ar_df["origen_oaci"].map(lambda x: airports.get(x, {}).get("lat"))
@@ -17,7 +17,7 @@ vuelos_ar_df.loc[:,"longitud_destino"] = vuelos_ar_df["destino_oaci"].map(lambda
 #%%
 aeropuertos_df = vuelos_ar_df.drop_duplicates(subset='origen_oaci', keep='first')
 aeropuertos_dict = pd.Series(
-    list(zip(aeropuertos_df['latitud_origen'], aeropuertos_df['longitud_origen'], aeropuertos_df["origen_aeropuerto"])),
+    list(zip(aeropuertos_df['latitud_origen'], aeropuertos_df['longitud_origen'], aeropuertos_df["origen_aeropuerto"], aeropuertos_df["origen_provincia"])),
     index=aeropuertos_df['origen_oaci']
 ).to_dict()
 #%%
@@ -29,6 +29,7 @@ pasajeros_ar_df['coords'] = pasajeros_ar_df['origen_oaci'].map(aeropuertos_dict)
 pasajeros_ar_df['latitud_origen'] = pasajeros_ar_df['coords'].apply(lambda x: x[0] if x is not None else None)
 pasajeros_ar_df['longitud_origen'] = pasajeros_ar_df['coords'].apply(lambda x: x[1] if x is not None else None)
 pasajeros_ar_df["aeropuerto_origen"] = pasajeros_ar_df['coords'].apply(lambda x: x[2] if x is not None else None)
+pasajeros_ar_df["provincia_origen"] = pasajeros_ar_df['coords'].apply(lambda x: x[3] if x is not None else None)
 
 #%%
 fig = go.Figure()

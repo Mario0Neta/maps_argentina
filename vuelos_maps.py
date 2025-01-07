@@ -11,6 +11,7 @@ aeropuertos_ar_df = pd.read_csv("/home/leontxo/Documents/maps_argentina/ar-airpo
 
 # %%
 vuelos_ar_df = vuelos_df[(vuelos_df["clasificacion_vuelo"] == "Cabotaje")].copy()
+#vuelos_ar_df = vuelos_ar_df[(vuelos_ar_df["origen_provincia"] == "Salta") | (vuelos_ar_df["destino_provincia"] == "Salta")]
 airports = airportsdata.load()
 # %%
 vuelos_ar_df.loc[:,"latitud_origen"] = vuelos_ar_df["origen_oaci"].map(lambda x: airports.get(x, {}).get("lat"))
@@ -19,25 +20,20 @@ vuelos_ar_df.loc[:,"latitud_destino"] = vuelos_ar_df["destino_oaci"].map(lambda 
 vuelos_ar_df.loc[:,"longitud_destino"] = vuelos_ar_df["destino_oaci"].map(lambda x: airports.get(x, {}).get("lon"))
 #%%
 aeropuertos_df = vuelos_ar_df.drop_duplicates(subset='origen_oaci', keep='first')
-aeropuertos_dict = pd.Series(
-    list(zip(aeropuertos_df['latitud_origen'], 
-             aeropuertos_df['longitud_origen'], 
-             aeropuertos_df["origen_aeropuerto"], 
-             aeropuertos_df["origen_provincia"],
-             aeropuertos_df["destino_provincia"])),
-    index=aeropuertos_df['origen_oaci']
-).to_dict()
 #%%
-pasajeros_ar_df = vuelos_ar_df.groupby(['origen_oaci', 'destino_oaci'])['pasajeros'].sum().reset_index()
-pasajeros_ar_df['coords'] = pasajeros_ar_df['destino_oaci'].map(aeropuertos_dict)
-pasajeros_ar_df['latitud_destino'] = pasajeros_ar_df['coords'].apply(lambda x: x[0] if x is not None else None)
-pasajeros_ar_df['longitud_destino'] = pasajeros_ar_df['coords'].apply(lambda x: x[1] if x is not None else None)
-pasajeros_ar_df["provincia_destino"] = pasajeros_ar_df['coords'].apply(lambda x: x[4] if x is not None else None)
-pasajeros_ar_df['coords'] = pasajeros_ar_df['origen_oaci'].map(aeropuertos_dict)
-pasajeros_ar_df['latitud_origen'] = pasajeros_ar_df['coords'].apply(lambda x: x[0] if x is not None else None)
-pasajeros_ar_df['longitud_origen'] = pasajeros_ar_df['coords'].apply(lambda x: x[1] if x is not None else None)
-pasajeros_ar_df["aeropuerto_origen"] = pasajeros_ar_df['coords'].apply(lambda x: x[2] if x is not None else None)
-pasajeros_ar_df["provincia_origen"] = pasajeros_ar_df['coords'].apply(lambda x: x[3] if x is not None else None)
+vuelos_ar_df['sorted_oaci_pair'] = vuelos_ar_df.apply(
+    lambda row: tuple(sorted([row['origen_oaci'], row['destino_oaci']])),
+    axis=1
+)
+pasajeros_ar_df = vuelos_ar_df.groupby('sorted_oaci_pair').agg(
+    pasajeros=('pasajeros', 'sum'),
+    latitud_origen=('latitud_origen', 'first'),
+    longitud_origen=('longitud_origen', 'first'),
+    latitud_destino=('latitud_destino', 'first'),
+    longitud_destino=('longitud_destino', "first"),
+    provincia_destino=("destino_provincia", "first"),
+    provincia_origen=("origen_provincia", "first")
+    )
 #%%
 #Open street maps 
 centro_argentina = [-36.616630, -64.317535]
@@ -54,12 +50,44 @@ for row in aeropuertos_df.itertuples():
 
 total_pasajeros = pasajeros_ar_df.pasajeros.sum()
 
+def style_function(feature):
+    return {
+        'color': "#FF0000",  # Initial color of the line
+        'weight': max(0.5, 100*(feature['properties']['pasajeros']/total_pasajeros)),
+        'opacity': 0.6
+    }
+
+def hover_style_function(feature):
+    return {
+        'color': "#0000FF",  # Color when hovering
+        'weight': 5,
+        'opacity': 0.9
+    }
+
+# Iterate over the DataFrame rows
 for row in pasajeros_ar_df.itertuples():
-    folium.PolyLine(
-        locations=[[row.latitud_origen, row.longitud_origen],[row.latitud_destino, row.longitud_destino]],
-        color="#FF0000",
-        weight= max(2, 200*(row.pasajeros/total_pasajeros)),
-        tooltip=f"Conexión entre {row.provincia_origen} y {row.provincia_destino}").add_to(mapa)
+    # Create a GeoJSON feature for each connection
+    geojson_feature = {
+        'type': 'Feature',
+        'geometry': {
+            'type': 'LineString',
+            'coordinates': [[row.longitud_origen, row.latitud_origen], [row.longitud_destino, row.latitud_destino]]
+        },
+        'properties': {
+            'pasajeros': row.pasajeros,
+            'provincia_origen': row.provincia_origen,
+            'provincia_destino': row.provincia_destino
+        }
+    }
+
+    # Add GeoJSON with hover effect
+    folium.GeoJson(
+        geojson_feature,
+        style_function=style_function,
+        highlight_function=hover_style_function,
+        tooltip=f"Conexión entre {row.provincia_origen} y {row.provincia_destino}. {row.pasajeros} números de pasajeros"
+    ).add_to(mapa)
+
 mapa
 
 #%%

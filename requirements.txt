@@ -33,6 +33,7 @@ MarkupSafe==3.0.2
 matplotlib==3.10.0
 matplotlib-inline==0.1.7
 mccabe==0.7.0
+mplcursors==0.6
 mypy-extensions==1.0.0
 nbformat==5.10.4
 nest-asyncio==1.6.0
@@ -58,6 +59,7 @@ pyzmq==26.2.0
 referencing==0.35.1
 requests==2.32.3
 rpds-py==0.22.3
+scipy==1.15.1
 six==1.16.0
 stack-data==0.6.3
 tenacity==9.0.0

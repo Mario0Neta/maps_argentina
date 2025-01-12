@@ -11,13 +11,15 @@ aeropuertos_ar_df = pd.read_csv("/home/leontxo/Documents/maps_argentina/ar-airpo
 
 # %%
 vuelos_ar_df = vuelos_df[(vuelos_df["clasificacion_vuelo"] == "Cabotaje")].copy()
-#vuelos_ar_df = vuelos_ar_df[(vuelos_ar_df["origen_provincia"] == "Salta") | (vuelos_ar_df["destino_provincia"] == "Salta")]
 airports = airportsdata.load()
 # %%
-vuelos_ar_df.loc[:,"latitud_origen"] = vuelos_ar_df["origen_oaci"].map(lambda x: airports.get(x, {}).get("lat"))
-vuelos_ar_df.loc[:,"longitud_origen"] = vuelos_ar_df["origen_oaci"].map(lambda x: airports.get(x, {}).get("lon"))
-vuelos_ar_df.loc[:,"latitud_destino"] = vuelos_ar_df["destino_oaci"].map(lambda x: airports.get(x, {}).get("lat"))
-vuelos_ar_df.loc[:,"longitud_destino"] = vuelos_ar_df["destino_oaci"].map(lambda x: airports.get(x, {}).get("lon"))
+def get_coordinates(airports_dict: dict, type_of_coordinates:str):
+    return lambda x: airports_dict.get(x, {}).get(type)
+
+vuelos_ar_df.loc[:,"latitud_origen"] = vuelos_ar_df["origen_oaci"].map(get_coordinates(airports_dict=airports, type_of_coordinates="lat"))
+vuelos_ar_df.loc[:,"longitud_origen"] = vuelos_ar_df["origen_oaci"].map(get_coordinates(airports_dict=airports, type_of_coordinates="lon"))
+vuelos_ar_df.loc[:,"latitud_destino"] = vuelos_ar_df["destino_oaci"].map(get_coordinates(airports_dict=airports, type_of_coordinates="lat"))
+vuelos_ar_df.loc[:,"longitud_destino"] = vuelos_ar_df["destino_oaci"].map(get_coordinates(airports_dict=airports, type_of_coordinates="lon"))
 #%%
 aeropuertos_df = vuelos_ar_df.drop_duplicates(subset='origen_oaci', keep='first')
 #%%
@@ -99,7 +101,7 @@ fig.add_trace(go.Scattergeo(
     lon = pasajeros_ar_df['longitud_origen'],
     lat = pasajeros_ar_df['latitud_origen'],
     hoverinfo = 'text',
-    text = pasajeros_ar_df["aeropuerto_origen"],
+    text = pasajeros_ar_df["provincia_origen"],
     mode = 'markers',
     marker = dict(
         size = 7,

@@ -16,3 +16,4 @@ I am having a look at all the figures and they now seem to be correct, this will
 
 I think my mistake came from not realising that 1e7 means multiplied by 10 million, therefore i get the correct figures. My usual type of mistakes that make me waste many days.
 
+## Analysis

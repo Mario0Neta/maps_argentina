@@ -13,3 +13,5 @@ Bibliography:
 https://plotly.com/python/lines-on-maps/
 
 https://cienciadedatos.net/documentos/py40-puntos-interes-openstreetmap-python
+
+https://cienciadedatos.net/documentos/py29-forecasting-demanda-energia-electrica-python

@@ -15,3 +15,5 @@ https://plotly.com/python/lines-on-maps/
 https://cienciadedatos.net/documentos/py40-puntos-interes-openstreetmap-python
 
 https://cienciadedatos.net/documentos/py29-forecasting-demanda-energia-electrica-python
+
+https://medium.com/@jainvidip/understanding-train-test-and-validation-data-in-machine-learning-f8276165619c

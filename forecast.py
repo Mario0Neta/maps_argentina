@@ -4,6 +4,10 @@ import pandas as pd
 import plotly.graph_objects as go
 import numpy as np
 
+from statsmodels.graphics.tsaplots import plot_pacf
+from statsmodels.graphics.tsaplots import plot_acf
+
+#%%
 vuelos_df = pd.read_csv("/home/leontxo/Documents/maps_argentina/base_microdatos.csv")
 vuelos_ar_df = vuelos_df[(vuelos_df["clasificacion_vuelo"] == "Cabotaje")].copy()
 vuelos_cordoba_df = vuelos_ar_df[(vuelos_ar_df["origen_provincia"] == "Córdoba") | (vuelos_ar_df["destino_provincia"] == "Córdoba")].copy()
@@ -87,4 +91,12 @@ axs[3].set_title('Pasajeros por semana', fontsize=9)
 
 fig.suptitle("Gráficos de estacionalidad sin y con Covid", fontsize=12)
 fig.tight_layout()
+# %%
+fig, ax = plt.subplots(figsize=(5,2))
+plot_pacf(vuelos_cordoba_df[vuelos_cordoba_df["covid"] == 0]["pasajeros"], ax=ax, lags=7)
+plt.show()
+# %%
+fig, ax = plt.subplots(figsize=(5,2))
+plot_acf(vuelos_cordoba_df[vuelos_cordoba_df["covid"] == 0]["pasajeros"], ax=ax, lags=7)
+plt.show()
 # %%

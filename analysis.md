@@ -23,4 +23,6 @@ What could possibly go wrong? The range of the series is not complete. I complet
 
 We can appreciate a estationary behaviour that persists during the covid pandemic, which is that during weekends demand decreases and the demand tends to increase during November and December.
 
+Autocorrelation and partial autocorrelation
+
 

@@ -23,6 +23,6 @@ What could possibly go wrong? The range of the series is not complete. I complet
 
 We can appreciate a estationary behaviour that persists during the covid pandemic, which is that during weekends demand decreases and the demand tends to increase during November and December.
 
-Autocorrelation and partial autocorrelation
+Autocorrelation and partial autocorrelation tell us that there are correlations with the seventh factor lag, that is, it is correlated to the day of the week.
 
 

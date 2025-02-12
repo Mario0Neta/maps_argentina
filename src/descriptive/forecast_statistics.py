@@ -63,18 +63,18 @@ vuelos_cordoba_df.to_csv(flights_ready_data_path, index=False)
 #%%
 ####################
 # Train, test and validation
-end_train = pd.to_datetime("01-02-2023")
+end_train = pd.to_datetime("01-02-2022")
 end_test = pd.to_datetime("01-02-2024")
 
 train_vuelos_cordoba_df = vuelos_cordoba_df[
     (vuelos_cordoba_df["fecha"]  <= end_train)
-].copy()
+]
 test_vuelos_cordoba_df = vuelos_cordoba_df[
     (vuelos_cordoba_df["fecha"]  > end_train) & (vuelos_cordoba_df["fecha"]  <= end_test)
-].copy()
+]
 validate_vuelos_cordoba_df = vuelos_cordoba_df[
     vuelos_cordoba_df["fecha"]  > end_test
-].copy()
+]
 print(
     f"Training will go from {train_vuelos_cordoba_df['fecha'].min()} to {train_vuelos_cordoba_df['fecha'].max()}"
 )
